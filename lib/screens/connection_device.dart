@@ -28,6 +28,8 @@ Future<void> showDeviceConnection(BuildContext context) async {
               ),
             ),
             const SizedBox(height: 20),
+
+            // fungsi untuk menyalakan WIFI perangkat
             ElevatedButton(
               onPressed: () async {
                 await WiFiForIoTPlugin.setEnabled(
@@ -49,6 +51,8 @@ Future<void> showDeviceConnection(BuildContext context) async {
               ),
             ),
             const SizedBox(height: 10),
+
+            // Fungsi untuk menghubungkkan ke GoPro
             ElevatedButton(
               onPressed: () {
                 // WiFiForIoTPlugin.connect('GoPro_Hotspot_SSID');
@@ -68,25 +72,25 @@ Future<void> showDeviceConnection(BuildContext context) async {
             ),
           ],
         ),
-        actions: <Widget>[
-          Align(
-            alignment: Alignment.center,
-            child: TextButton(
-              child: const Text(
-                'Lanjut ke Dashboard',
-                style: TextStyle(
-                  color: Colors.blue,
-                  fontSize: 14,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              onPressed: () {
-                Navigator.of(context).pop();
-                Navigator.pushNamed(context, '/dashboard');
-              },
-            ),
-          ),
-        ],
+        // actions: <Widget>[
+        //   Align(
+        //     alignment: Alignment.center,
+        //     child: TextButton(
+        //       child: const Text(
+        //         'Lanjut ke Dashboard',
+        //         style: TextStyle(
+        //           color: Colors.blue,
+        //           fontSize: 14,
+        //           fontWeight: FontWeight.bold,
+        //         ),
+        //       ),
+        //       onPressed: () {
+        //         // Navigator.of(context).pop();
+        //         Navigator.pushNamed(context, '/dashboard');
+        //       },
+        //     ),
+        //   ),
+        // ],
       );
     },
   );

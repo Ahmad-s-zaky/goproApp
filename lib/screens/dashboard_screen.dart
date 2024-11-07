@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:goproapp/screens/connection_device.dart';
-import 'package:goproapp/screens/device_screen.dart';
+import 'package:goproapp/screens/view_media_screen.dart';
 import 'package:goproapp/screens/mulai_survey.dart';
 import 'package:goproapp/screens/survey_screen.dart';
-import '../models/data_riwayat.dart';
+import '../../models/data_riwayat.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
