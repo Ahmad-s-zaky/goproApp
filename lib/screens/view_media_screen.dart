@@ -1,138 +1,187 @@
 // ignore_for_file: avoid_print
 
 import 'package:flutter/material.dart';
-import 'package:goproapp/models/media_list.dart';
-// import 'package:goproapp/screens/view_media/upload_media_screen.dart';
-import 'package:http/http.dart' as http;
 
-class DeviceScreen extends StatefulWidget {
-  const DeviceScreen({super.key});
+class ViewMediaScreen extends StatefulWidget {
+  const ViewMediaScreen({super.key});
 
   @override
-  State<DeviceScreen> createState() => _DeviceScreenState();
+  State<ViewMediaScreen> createState() => _ViewMediaScreenState();
 }
 
-class _DeviceScreenState extends State<DeviceScreen> {
-  Map<int, bool> isLoadingMap = {};
-
-  // Daftar media sebagai contoh
-  final List<MediaList> mediaList = [
-    MediaList(nama: "Media 1"),
-    MediaList(nama: "Media 2"),
-    MediaList(nama: "Media 3"),
-    MediaList(nama: "Media 4"),
-    MediaList(nama: "Media 5"),
+class _ViewMediaScreenState extends State<ViewMediaScreen> {
+  List<bool> _selectedRows = [];
+  final List<Map<String, String>> _data = [
+    {'nama': 'Survei Garut - Bandung', 'status': 'selesai'},
+    {'nama': 'Survei Garut - Las Vegas', 'status': 'belum-selesai'},
   ];
 
-  Future<void> pushData(int index) async {
-    setState(() {
-      isLoadingMap[index] = true;
-    });
-    try {
-      var url = Uri.parse('BaseURL/data');
-      var response = await http.post(url, body: {
-        'key': 'value',
-      });
-      if (response.statusCode == 200) {
-        print('Data telah di upload');
-      } else {
-        print('Gagal di upload');
-      }
-    } catch (error) {
-      print('Error: $error');
-    } finally {
-      setState(() {
-        isLoadingMap[index] = false;
-      });
-    }
+  @override
+  void initState() {
+    super.initState();
+    _selectedRows = List<bool>.filled(_data.length, false);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Padding(
-        padding:
-            const EdgeInsets.all(16.0), // Tambahkan margin di sekitar konten
+      body: Center(
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
           children: [
             const SizedBox(height: 50),
             const Text(
-              "Media List",
-              style: TextStyle(
-                fontSize: 32,
-                fontWeight: FontWeight.bold,
-                color: Colors.black,
-              ),
+              'View Media',
+              style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
             ),
-            const SizedBox(height: 10),
-            Center(
-              child: DataTable(
-                columnSpacing: 230,
-                columns: const [
-                  DataColumn(
-                    label: Text(
-                      "",
-                      style: TextStyle(fontWeight: FontWeight.bold),
+            const SizedBox(height: 30),
+            DataTable(
+              columns: const [
+                DataColumn(label: Text('Nama File')),
+                DataColumn(label: Text('Status')),
+                // DataColumn(label: Text('Action')),
+              ],
+              rows: List<DataRow>.generate(
+                _data.length,
+                (index) => DataRow(
+                  selected: _selectedRows[index],
+                  onSelectChanged: (bool? selected) {
+                    if (selected != null && !selected) {
+                      setState(() {
+                        _selectedRows[index] = false;
+                      });
+                    } else {
+                      _showSingleActionDialog(_data[index]);
+                    }
+                  },
+                  cells: [
+                    DataCell(
+                      Text(
+                        _data[index]['nama']!,
+                        style: const TextStyle(fontSize: 14),
+                      ),
+                      onTap: () {
+                        _showSingleActionDialog(_data[index]);
+                      },
                     ),
-                  ),
-                  DataColumn(
-                    label: Text(
-                      '',
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                  ),
-                ],
-                rows: List<DataRow>.generate(mediaList.length, (index) {
-                  return DataRow(
-                    cells: [
-                      DataCell(
-                        Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 8.0),
-                          child: Text(
-                            mediaList[index].nama,
-                            overflow: TextOverflow.ellipsis,
-                            maxLines: 2,
-                            style: const TextStyle(fontSize: 14),
+                    DataCell(
+                      ConstrainedBox(
+                        constraints: const BoxConstraints(
+                          minWidth: 90, // Fixed width for status box
+                          minHeight: 30, // Fixed height for status box
+                        ),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: getStatusColor(_data[index]['status']!),
+                            borderRadius: BorderRadius.circular(5),
                           ),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 4,
+                            vertical: 2,
+                          ),
+                          child: getStatusUpload(_data[index]['status']!),
                         ),
                       ),
-                      DataCell(
-                        SizedBox(
-                          width: 90, // Lebar tombol yang lebih kecil
-                          height: 30, // Tinggi tombol yang lebih kecil
-                          child: ElevatedButton(
-                            onPressed: isLoadingMap[index] == true
-                                ? null // Matikan tombol saat loading
-                                : () => pushData(index),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.blue,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(4),
-                              ),
-                            ),
-                            child: isLoadingMap[index] == true
-                                ? const CircularProgressIndicator(
-                                    color: Colors.white,
-                                  )
-                                : const Text(
-                                    'Upload',
-                                    style: TextStyle(
-                                      fontSize: 12,
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  );
-                }).toList(),
+                    ),
+                    // DataCell(
+                    //   SizedBox(
+                    //     width: 70,
+                    //     height: 30, // Keep button size consistent
+                    //     child: ElevatedButton(
+                    //       onPressed: () {},
+                    //       style: ElevatedButton.styleFrom(
+                    //         backgroundColor: Colors.blueAccent,
+                    //         padding: const EdgeInsets.symmetric(horizontal: 4),
+                    //         shape: RoundedRectangleBorder(
+                    //           borderRadius: BorderRadius.circular(4),
+                    //         ),
+                    //       ),
+                    //       child: const Text(
+                    //         'Upload',
+                    //         style: TextStyle(
+                    //           fontSize: 10,
+                    //           fontWeight: FontWeight.bold,
+                    //           color: Colors.white,
+                    //         ),
+                    //       ),
+                    //     ),
+                    //   ),
+                    // ),
+                  ],
+                ),
               ),
             ),
           ],
         ),
       ),
     );
+  }
+
+  Text getStatusUpload(String status) {
+    switch (status) {
+      case 'selesai':
+        return const Text(
+          'Uploaded',
+          textAlign: TextAlign.center,
+          style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+        );
+      case 'belum-selesai':
+        return const Text(
+          'Not Uploaded',
+          textAlign: TextAlign.center,
+          style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+        );
+      default:
+        return const Text(
+          'NaN',
+          textAlign: TextAlign.center,
+          style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+        );
+    }
+  }
+
+  Color getStatusColor(String status) {
+    switch (status) {
+      case 'selesai':
+        return Colors.green;
+      case 'belum-selesai':
+        return Colors.red;
+      default:
+        return Colors.black;
+    }
+  }
+
+  void _showSingleActionDialog(Map<String, String> data) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(
+            '${data['nama']}',
+            style: const TextStyle(fontWeight: FontWeight.bold),
+          ),
+          content: const Text('Apa Anda yakin untuk upload file ini?'),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(15),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                _uploadData(data);
+              },
+              child: const Text(
+                'Upload',
+                style: TextStyle(color: Colors.green),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _uploadData(Map<String, String> data) {
+    // Logika untuk upload
+    print('Uploading data: ${data['nama']}');
   }
 }

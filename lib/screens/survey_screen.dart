@@ -1,7 +1,7 @@
 // ignore_for_file: library_private_types_in_public_api
 
 import 'package:flutter/material.dart';
-import 'package:goproapp/screens/dashboard_screen.dart';
+import 'package:goproapp/screens/bottom_navbar_config.dart';
 
 class SurveyScreen extends StatefulWidget {
   const SurveyScreen({super.key});
@@ -186,7 +186,7 @@ class _SurveyScreenState extends State<SurveyScreen> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => const DashboardScreen(),
+                      builder: (context) => const BottomNavbarConfig(),
                     ),
                   );
                 },

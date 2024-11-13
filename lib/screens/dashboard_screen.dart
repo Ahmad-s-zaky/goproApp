@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:goproapp/screens/connection_device.dart';
-import 'package:goproapp/screens/view_media_screen.dart';
+// import 'package:goproapp/screens/dashboard/connection_device.dart';
 import 'package:goproapp/screens/mulai_survey.dart';
-import 'package:goproapp/screens/survey_screen.dart';
 import '../../models/data_riwayat.dart';
 
 class DashboardScreen extends StatefulWidget {
@@ -13,26 +11,32 @@ class DashboardScreen extends StatefulWidget {
 }
 
 class _DashboardScreenState extends State<DashboardScreen> {
-  @override
-  void initState() {
-    super.initState();
-
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      showDeviceConnection(context);
-    });
-  }
-
-  // Metode untuk mendapatkan warna berdasarkan status
+  // Method to get color based on status
   Color getStatusColor(String status) {
     switch (status) {
       case 'selesai':
-        return Colors.green; // Warna hijau untuk status selesai
-      case 'dalam-proses':
-        return Colors.yellow; // Warna kuning untuk status dalam proses
+        return Colors.green; // Green color for completed status
       case 'belum-selesai':
-        return Colors.red; // Warna merah untuk status belum mulai
+        return Colors.red; // Red color for not started status
       default:
-        return Colors.black; // Warna default
+        return Colors.black; // Default color
+    }
+  }
+
+  Text getStatusTextSurvey(String status) {
+    switch (status) {
+      case 'selesai':
+        return const Text('Surveyed',
+            textAlign: TextAlign.center,
+            style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold));
+      case 'belum-selesai':
+        return const Text('Not Surveyed',
+            textAlign: TextAlign.center,
+            style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold));
+      default:
+        return const Text('NaN',
+            textAlign: TextAlign.center,
+            style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold));
     }
   }
 
@@ -41,7 +45,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     return Scaffold(
       backgroundColor: Colors.grey[200],
       body: Padding(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.all(16),
         child: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -54,12 +58,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   boxShadow: [
                     BoxShadow(
                       color: Colors.black.withOpacity(0.2),
-                      blurRadius: 10,
-                      offset: const Offset(0, 5),
+                      blurRadius: 8,
+                      offset: const Offset(0, 4),
                     ),
                   ],
                   shape: BoxShape.circle,
-                  border: Border.all(color: Colors.black, width: 2),
+                  border: Border.all(color: Colors.black, width: 1.5),
                 ),
                 child: ClipOval(
                   child: Image.asset(
@@ -68,63 +72,70 @@ class _DashboardScreenState extends State<DashboardScreen> {
                   ),
                 ),
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 80),
 
               // Data Table Styling
               DataTable(
-                columnSpacing: 80, // Jarak antar kolom
+                columnSpacing: 40, // Reduced space between columns
+                headingRowHeight: 35,
+                dataRowMinHeight: 40,
                 columns: const [
                   DataColumn(
-                    label: Expanded(
-                      child: Text(
-                        '',
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
+                    label: Text(
+                      'Nama Rute Survei',
+                      style:
+                          TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
                     ),
                   ),
                   DataColumn(
-                    label: SizedBox(
-                      width: 100, // Lebar kolom Mulai
-                      child: Text(
-                        '',
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
+                    label: Text(
+                      'Status',
+                      style:
+                          TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
+                    ),
+                  ),
+                  DataColumn(
+                    label: Text(
+                      'Action',
+                      style:
+                          TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
                     ),
                   ),
                 ],
                 rows: dataList.map((data) {
                   return DataRow(cells: [
                     DataCell(
-                      Row(
-                        children: [
-                          // Simbol bulat di samping kiri atribut rute
-                          Container(
-                            width: 10,
-                            height: 10,
-                            decoration: BoxDecoration(
-                              color: getStatusColor(
-                                  data.status), // Warna berdasarkan status
-                              shape: BoxShape.circle,
-                            ),
+                      Text(
+                        data.rute,
+                        overflow: TextOverflow.ellipsis, // Handle text overflow
+                        style: const TextStyle(fontSize: 12),
+                      ),
+                    ),
+                    DataCell(
+                      ConstrainedBox(
+                        constraints: const BoxConstraints(
+                          minWidth: 90, // Fixed width for status box
+                          minHeight: 30, // Fixed height for status box
+                        ),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: getStatusColor(data.status),
+                            borderRadius: BorderRadius.circular(
+                              5,
+                            ), // Memberikan lekuk halus
                           ),
-                          const SizedBox(
-                              width: 5), // Jarak antara simbol dan teks
-                          // Memastikan rute memiliki lebar yang cukup
-                          Expanded(
-                            child: Text(
-                              data.rute,
-                              overflow: TextOverflow
-                                  .ellipsis, // Memotong teks yang terlalu panjang
-                              maxLines: 1, // Menetapkan jumlah baris maksimal
-                            ),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 4,
+                            vertical: 2,
                           ),
-                        ],
+                          child: getStatusTextSurvey(data.status),
+                        ),
                       ),
                     ),
                     DataCell(
                       SizedBox(
-                        width: 80,
-                        height: 35, // Tetap ukuran untuk tombol Mulai
+                        width: 70,
+                        height: 30, // Keep button size consistent
                         child: ElevatedButton(
                           onPressed: () {
                             Navigator.push(
@@ -136,8 +147,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.blueAccent,
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 3, vertical: 3),
+                            padding: const EdgeInsets.symmetric(horizontal: 4),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(4),
                             ),
@@ -145,7 +155,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           child: const Text(
                             'Mulai',
                             style: TextStyle(
-                              fontSize: 12,
+                              fontSize: 10,
                               fontWeight: FontWeight.bold,
                               color: Colors.white,
                             ),
@@ -157,66 +167,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 }).toList(),
               ),
 
-              const SizedBox(height: 100),
-
-              // Button Group Styling
-              Column(
-                children: [
-                  ElevatedButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const SurveyScreen(),
-                        ),
-                      );
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blueAccent,
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 80, vertical: 10),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(15),
-                      ),
-                    ),
-                    child: const Text(
-                      'Survey',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  ElevatedButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const DeviceScreen(),
-                        ),
-                      );
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.greenAccent,
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 60, vertical: 10),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(15),
-                      ),
-                    ),
-                    child: const Text(
-                      'View Media',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
+              const SizedBox(height: 60),
             ],
           ),
         ),

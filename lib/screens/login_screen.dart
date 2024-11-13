@@ -30,7 +30,7 @@ class _LoginScreenState extends State<LoginScreen> {
         _isLoading = false;
         _message = '';
       });
-      Navigator.pushReplacementNamed(context, '/dashboard');
+      Navigator.pushReplacementNamed(context, '/bottomConfig');
     } else {
       setState(() {
         _isLoading = false;
